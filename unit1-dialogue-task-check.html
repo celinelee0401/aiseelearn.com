@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>B3 U1 Dialogue | AI See Learn</title>
+  <title>B3 U1 Dialogue | 愛思學 AI See Learn</title>
+  <meta name="description" content="愛思學 AI See Learn 的 B3 U1 Dialogue 任務式聽力學習流程。">
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body data-page="unit-task">
@@ -12,7 +13,7 @@
       <span class="brand-mark">AI</span>
       <span>
         <strong>AI See Learn</strong>
-        <small>B3 U1 Dialogue</small>
+        <small>愛思學 · B3 U1 Dialogue</small>
       </span>
     </a>
     <nav class="top-nav" aria-label="Main navigation">
@@ -25,7 +26,7 @@
     <section class="lesson-topline" aria-labelledby="lesson-title">
       <div>
         <p class="eyebrow">Unit 1 Dialogue Part 1</p>
-        <h1 id="lesson-title">Task Check: Listen and Catch Keywords</h1>
+        <h1 id="lesson-title">Listen First, Then Find Your Next Task</h1>
       </div>
       <div class="resume-card" aria-live="polite">
         <span>Local Progress</span>
@@ -33,11 +34,10 @@
       </div>
     </section>
 
-    <section class="path-strip" aria-label="Learning path">
-      <button class="path-pill active" type="button" data-path-select="S4">S4 Keyword Support</button>
-      <button class="path-pill" type="button" data-path-select="S3">S3 Table Check</button>
-      <button class="path-pill" type="button" data-path-select="S2">S2 Sentence Stretch</button>
-      <button class="path-pill" type="button" data-path-select="S1">S1 Thinking Stretch</button>
+    <section class="flow-strip" aria-label="Learning flow">
+      <span class="flow-pill active" data-flow-step="warmup">1 AI Warm-up</span>
+      <span class="flow-pill" data-flow-step="listening">2 Listening Table</span>
+      <span class="flow-pill" data-flow-step="next">3 Next Task</span>
     </section>
 
     <div class="lesson-layout">
@@ -57,27 +57,60 @@
         </section>
 
         <section class="checkpoint-card" aria-labelledby="checkpoint-title">
-          <h2 id="checkpoint-title">Path Check</h2>
+          <h2 id="checkpoint-title">Task Guide</h2>
           <div class="check-row">
-            <span>Start</span>
-            <strong data-current-path>S4</strong>
+            <span>Current step</span>
+            <strong data-current-step>Warm-up</strong>
           </div>
           <div class="check-row">
-            <span>Task</span>
-            <strong data-task-status>In progress</strong>
+            <span>Next task</span>
+            <strong data-current-path>Not decided</strong>
           </div>
-          <button class="button primary full" type="button" data-mark-complete>Mark Done</button>
+          <button class="button primary full" type="button" data-check-listening>Recommend Next Task</button>
         </section>
       </aside>
 
       <section class="task-column" aria-labelledby="task-title">
         <div class="task-header">
           <div>
-            <p class="eyebrow">Task Check 1</p>
-            <h2 id="task-title">Who, Where, Weather, One Thing</h2>
+            <p class="eyebrow">Common Start</p>
+            <h2 id="task-title">Everybody listens first.</h2>
           </div>
           <span class="save-state" data-save-state>Ready</span>
         </div>
+
+        <section class="instruction-panel" aria-labelledby="instruction-title">
+          <div>
+            <h3 id="instruction-title">任務起手式</h3>
+            <p>先不要選程度。每個人都從同一段 Dialogue 開始：先看圖和 AI 暖身，再邊聽影片邊完成 Listening Table。完成後，系統會依你的答案完整度推薦下一個任務。</p>
+          </div>
+          <button class="button primary" type="button" data-start-task>Start Warm-up</button>
+        </section>
+
+        <section class="ai-warmup-panel" aria-labelledby="warmup-title">
+          <div class="panel-heading">
+            <p class="eyebrow">Before Listening</p>
+            <h3 id="warmup-title">AI Warm-up Chat</h3>
+          </div>
+          <div class="chat-thread" aria-label="AI warm-up prompts">
+            <article class="chat-bubble ai">
+              <span>AI</span>
+              <p>Look at the picture and the title. What place, weather, or object do you notice?</p>
+            </article>
+            <article class="chat-bubble learner">
+              <span>My answer</span>
+              <textarea data-field="warmupNotice" rows="3" aria-label="Warm-up answer" placeholder="I notice..."></textarea>
+            </article>
+            <article class="chat-bubble ai">
+              <span>AI</span>
+              <p>Ask one question before listening. You can ask in Chinese or English.</p>
+            </article>
+            <article class="chat-bubble learner">
+              <span>My question</span>
+              <input data-field="warmupQuestion" aria-label="Warm-up question" placeholder="Why is...? / What does...?">
+            </article>
+          </div>
+        </section>
 
         <section class="word-bank-panel" aria-labelledby="word-bank-title">
           <div class="word-bank-title">
@@ -100,7 +133,10 @@
         </section>
 
         <section class="answer-panel" aria-labelledby="table-title">
-          <h3 id="table-title">Listening Table</h3>
+          <div class="panel-heading">
+            <p class="eyebrow">During Listening</p>
+            <h3 id="table-title">Listening Table</h3>
+          </div>
           <div class="table-wrap">
             <table>
               <thead>
@@ -129,28 +165,36 @@
           </div>
         </section>
 
-        <section class="level-tasks" aria-label="Differentiated tasks">
-          <article class="level-task" data-level-task="S4">
-            <span>S4</span>
-            <h3>Choose or copy keywords</h3>
-            <p>India, Australia, hot, rained, cold, snowed, postcard.</p>
-          </article>
-          <article class="level-task" data-level-task="S3">
-            <span>S3</span>
-            <h3>Complete the table</h3>
-            <p>Fill in place, weather, and one thing for Zac and Jamie.</p>
-          </article>
-          <article class="level-task" data-level-task="S2">
-            <span>S2</span>
-            <h3>Write two sentences</h3>
-            <label>Zac sentence<input data-field="zacSentence" placeholder="Zac went to..."></label>
-            <label>Jamie sentence<input data-field="jamieSentence" placeholder="Jamie went to..."></label>
-          </article>
-          <article class="level-task" data-level-task="S1">
-            <span>S1</span>
-            <h3>Explain the weather difference</h3>
-            <textarea data-field="thinking" rows="4" aria-label="Thinking stretch"></textarea>
-          </article>
+        <section class="recommend-panel" aria-labelledby="recommend-title" data-recommend-panel>
+          <div class="panel-heading">
+            <p class="eyebrow">After Listening</p>
+            <h3 id="recommend-title">Recommended Next Task</h3>
+          </div>
+          <p class="recommend-copy" data-recommend-copy>Finish the warm-up and Listening Table, then click “Recommend Next Task.”</p>
+          <div class="next-task-grid" aria-label="Next tasks">
+            <article class="next-task-card" data-level-task="keyword">
+              <span>Need Word Help</span>
+              <h4>Choose or copy keywords</h4>
+              <p>Use the Word Bank to catch place, weather, and one thing first.</p>
+            </article>
+            <article class="next-task-card" data-level-task="table">
+              <span>Fill the Table</span>
+              <h4>Check missing information</h4>
+              <p>Go back to the video and complete the missing cells.</p>
+            </article>
+            <article class="next-task-card" data-level-task="sentences">
+              <span>Write Sentences</span>
+              <h4>Write two sentences</h4>
+              <label>Zac sentence<input data-field="zacSentence" placeholder="Zac went to..."></label>
+              <label>Jamie sentence<input data-field="jamieSentence" placeholder="Jamie went to..."></label>
+            </article>
+            <article class="next-task-card" data-level-task="thinking">
+              <span>Explain Why</span>
+              <h4>Explain the weather difference</h4>
+              <textarea data-field="thinking" rows="4" aria-label="Thinking stretch" placeholder="The weather is different because..."></textarea>
+            </article>
+          </div>
+          <button class="button ghost full" type="button" data-mark-complete>Mark This Lesson Done</button>
         </section>
       </section>
     </div>

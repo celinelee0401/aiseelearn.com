@@ -199,7 +199,10 @@ a {
 .video-card,
 .checkpoint-card,
 .task-column,
-.level-task {
+.instruction-panel,
+.ai-warmup-panel,
+.recommend-panel,
+.next-task-card {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -246,7 +249,7 @@ a {
   padding: 14px 16px;
 }
 
-.path-strip {
+.flow-strip {
   position: sticky;
   top: 69px;
   z-index: 18;
@@ -257,17 +260,17 @@ a {
   background: var(--paper);
 }
 
-.path-pill {
+.flow-pill {
   flex: 0 0 auto;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px 12px;
   background: #fff;
   color: var(--ink);
-  cursor: pointer;
+  font-weight: 800;
 }
 
-.path-pill.active {
+.flow-pill.active {
   border-color: var(--teal);
   background: var(--teal);
   color: #fff;
@@ -326,7 +329,9 @@ video {
 .task-header h2,
 .answer-panel h3,
 .word-bank-title h3,
-.level-task h3 {
+.instruction-panel h3,
+.panel-heading h3,
+.next-task-card h4 {
   margin: 0;
 }
 
@@ -375,6 +380,74 @@ video {
   color: var(--green);
   font-size: 13px;
   font-weight: 700;
+}
+
+.instruction-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: #fffdf8;
+  border-color: #ead8b5;
+}
+
+.instruction-panel h3,
+.panel-heading h3 {
+  color: var(--navy);
+  font-size: 22px;
+}
+
+.instruction-panel p,
+.recommend-copy {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.ai-warmup-panel,
+.recommend-panel {
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+.panel-heading {
+  margin-bottom: 10px;
+}
+
+.chat-thread {
+  display: grid;
+  gap: 10px;
+}
+
+.chat-bubble {
+  display: grid;
+  gap: 6px;
+  max-width: 88%;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.chat-bubble span,
+.next-task-card > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.chat-bubble p {
+  margin: 0;
+}
+
+.chat-bubble.ai {
+  background: var(--wash);
+}
+
+.chat-bubble.learner {
+  justify-self: end;
+  width: min(88%, 620px);
+  background: #f7fafb;
+  border: 1px solid var(--soft-line);
 }
 
 .word-bank-panel {
@@ -434,7 +507,7 @@ video {
 }
 
 .selected-keywords span,
-.level-task > span {
+.next-task-card > span {
   color: var(--muted);
   font-size: 13px;
   font-weight: 800;
@@ -519,34 +592,36 @@ td input {
   font-size: 17px;
 }
 
-.level-tasks {
+.next-task-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  margin-top: 16px;
+  margin: 14px 0;
 }
 
-.level-task {
+.next-task-card {
   padding: 14px;
+  opacity: 0.72;
 }
 
-.level-task.active {
+.next-task-card.active {
   border-color: var(--teal);
   box-shadow: 0 0 0 3px rgba(19, 124, 120, 0.1);
+  opacity: 1;
 }
 
-.level-task h3 {
+.next-task-card h4 {
   margin-top: 3px;
   color: var(--navy);
   font-size: 18px;
 }
 
-.level-task p {
+.next-task-card p {
   margin: 8px 0 0;
   color: var(--muted);
 }
 
-.level-task label {
+.next-task-card label {
   display: grid;
   gap: 6px;
   margin-top: 9px;
@@ -578,6 +653,10 @@ td input {
   video {
     max-height: none;
   }
+
+  .instruction-panel {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 660px) {
@@ -591,13 +670,28 @@ td input {
     overflow-x: auto;
   }
 
+  .flow-strip {
+    flex-wrap: wrap;
+  }
+
+  .flow-pill {
+    flex: 1 1 120px;
+    text-align: center;
+  }
+
   .course-hero h1,
   .lesson-topline h1 {
     font-size: 38px;
   }
 
-  .level-tasks {
+  .next-task-grid {
     grid-template-columns: 1fr;
+  }
+
+  .chat-bubble,
+  .chat-bubble.learner {
+    width: 100%;
+    max-width: 100%;
   }
 
   .selected-keywords {

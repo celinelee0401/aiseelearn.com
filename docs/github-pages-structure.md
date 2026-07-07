@@ -26,6 +26,7 @@ aiseelearn.com/
 - Student answers are not sent to a server.
 - Answers and progress are saved only in the same browser with `localStorage`.
 - The Unit 1 page is designed as a lesson-flow test, not a final LMS.
+- Students begin from the same AI warm-up and Listening Table before the page recommends a next task.
 - The video is intentionally compact so students can listen and fill the table at the same time.
 - The Word Bank remains visible while students work.
 
@@ -42,7 +43,8 @@ The current frontend state can later map to a learning-history database:
 {
   "studentAlias": "80105",
   "lessonId": "b3-u1-dialogue-part1",
-  "path": "S3",
+  "step": "next",
+  "nextTask": "sentences",
   "taskStatus": "in_progress",
   "answers": {
     "zacPlace": "India",
