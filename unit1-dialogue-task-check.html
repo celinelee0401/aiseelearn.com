@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>B3 U1 Dialogue | AI See Learn</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="unit-task">
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="AI See Learn home">
+      <span class="brand-mark">AI</span>
+      <span>
+        <strong>AI See Learn</strong>
+        <small>B3 U1 Dialogue</small>
+      </span>
+    </a>
+    <nav class="top-nav" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <button type="button" data-clear-progress>Reset</button>
+    </nav>
+  </header>
+
+  <main class="lesson-shell">
+    <section class="lesson-topline" aria-labelledby="lesson-title">
+      <div>
+        <p class="eyebrow">Unit 1 Dialogue Part 1</p>
+        <h1 id="lesson-title">Task Check: Listen and Catch Keywords</h1>
+      </div>
+      <div class="resume-card" aria-live="polite">
+        <span>Local Progress</span>
+        <strong data-progress-text>Not started</strong>
+      </div>
+    </section>
+
+    <section class="path-strip" aria-label="Learning path">
+      <button class="path-pill active" type="button" data-path-select="S4">S4 Keyword Support</button>
+      <button class="path-pill" type="button" data-path-select="S3">S3 Table Check</button>
+      <button class="path-pill" type="button" data-path-select="S2">S2 Sentence Stretch</button>
+      <button class="path-pill" type="button" data-path-select="S1">S1 Thinking Stretch</button>
+    </section>
+
+    <div class="lesson-layout">
+      <aside class="media-column" aria-label="Learning video">
+        <section class="video-card">
+          <video
+            controls
+            preload="metadata"
+            poster="assets/images/B3_U1_Dialogue_Part1_TaskCheck_preview.png"
+            src="assets/videos/B3_U1_Dialogue_Part1_TaskCheck.mp4">
+          </video>
+          <div class="video-meta">
+            <span>2:24</span>
+            <span>Part 1</span>
+            <span>Dialogue Listening</span>
+          </div>
+        </section>
+
+        <section class="checkpoint-card" aria-labelledby="checkpoint-title">
+          <h2 id="checkpoint-title">Path Check</h2>
+          <div class="check-row">
+            <span>Start</span>
+            <strong data-current-path>S4</strong>
+          </div>
+          <div class="check-row">
+            <span>Task</span>
+            <strong data-task-status>In progress</strong>
+          </div>
+          <button class="button primary full" type="button" data-mark-complete>Mark Done</button>
+        </section>
+      </aside>
+
+      <section class="task-column" aria-labelledby="task-title">
+        <div class="task-header">
+          <div>
+            <p class="eyebrow">Task Check 1</p>
+            <h2 id="task-title">Who, Where, Weather, One Thing</h2>
+          </div>
+          <span class="save-state" data-save-state>Ready</span>
+        </div>
+
+        <section class="word-bank-panel" aria-labelledby="word-bank-title">
+          <div class="word-bank-title">
+            <h3 id="word-bank-title">Word Bank</h3>
+            <button class="mini-button" type="button" data-copy-keywords>Copy Selected</button>
+          </div>
+          <div class="word-bank" aria-label="Word bank">
+            <button type="button" data-word="India">India</button>
+            <button type="button" data-word="Australia">Australia</button>
+            <button type="button" data-word="hot">hot</button>
+            <button type="button" data-word="rained">rained</button>
+            <button type="button" data-word="cold">cold</button>
+            <button type="button" data-word="snowed">snowed</button>
+            <button type="button" data-word="postcard">postcard</button>
+          </div>
+          <label class="selected-keywords">
+            <span>My keywords</span>
+            <input data-field="keywords" aria-label="Selected keywords">
+          </label>
+        </section>
+
+        <section class="answer-panel" aria-labelledby="table-title">
+          <h3 id="table-title">Listening Table</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Person</th>
+                  <th>Place</th>
+                  <th>Weather</th>
+                  <th>Thing</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Zac</th>
+                  <td><input data-field="zacPlace" aria-label="Zac place"></td>
+                  <td><input data-field="zacWeather" aria-label="Zac weather"></td>
+                  <td><input data-field="zacThing" aria-label="Zac thing"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Jamie</th>
+                  <td><input data-field="jamiePlace" aria-label="Jamie place"></td>
+                  <td><input data-field="jamieWeather" aria-label="Jamie weather"></td>
+                  <td><input data-field="jamieThing" aria-label="Jamie thing"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="level-tasks" aria-label="Differentiated tasks">
+          <article class="level-task" data-level-task="S4">
+            <span>S4</span>
+            <h3>Choose or copy keywords</h3>
+            <p>India, Australia, hot, rained, cold, snowed, postcard.</p>
+          </article>
+          <article class="level-task" data-level-task="S3">
+            <span>S3</span>
+            <h3>Complete the table</h3>
+            <p>Fill in place, weather, and one thing for Zac and Jamie.</p>
+          </article>
+          <article class="level-task" data-level-task="S2">
+            <span>S2</span>
+            <h3>Write two sentences</h3>
+            <label>Zac sentence<input data-field="zacSentence" placeholder="Zac went to..."></label>
+            <label>Jamie sentence<input data-field="jamieSentence" placeholder="Jamie went to..."></label>
+          </article>
+          <article class="level-task" data-level-task="S1">
+            <span>S1</span>
+            <h3>Explain the weather difference</h3>
+            <textarea data-field="thinking" rows="4" aria-label="Thinking stretch"></textarea>
+          </article>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
