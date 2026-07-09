@@ -1428,6 +1428,8 @@ td input {
 .bridge-step,
 .finisher-grid article,
 .pacing-card,
+.teacher-control-panel,
+.playlist-metric,
 .playlist-board,
 .task-library-panel,
 .playlist-period,
@@ -1485,6 +1487,45 @@ td input {
 
 .path-legend strong {
   color: var(--ink);
+}
+
+.teacher-control-panel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(220px, 0.8fr);
+  gap: 12px;
+  padding: 14px;
+  background: #f7fbfa;
+}
+
+.playlist-metric {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+}
+
+.playlist-metric span,
+.playlist-actions span {
+  color: var(--coral);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.playlist-metric strong {
+  color: var(--navy);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.playlist-metric p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.playlist-actions {
+  display: grid;
+  align-content: center;
+  gap: 10px;
 }
 
 .pacing-grid {
@@ -1558,6 +1599,77 @@ td input {
   grid-column: 1 / -1;
   background: #fffdf8;
   border-color: #ead8b5;
+}
+
+.playlist-period.status-assigned {
+  border-color: rgba(201, 149, 60, 0.58);
+  box-shadow: 0 0 0 3px rgba(201, 149, 60, 0.08);
+}
+
+.playlist-period.status-done {
+  border-color: rgba(19, 124, 120, 0.5);
+  background: #f7fbfa;
+  box-shadow: 0 0 0 3px rgba(19, 124, 120, 0.08);
+}
+
+.period-planner {
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid var(--soft-line);
+  padding-top: 10px;
+}
+
+.period-status-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.period-status-control button {
+  min-height: 36px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.period-status-control button:last-child {
+  border-right: 0;
+}
+
+.period-status-control button.active {
+  background: var(--teal);
+  color: #fff;
+}
+
+.period-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.period-flags label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--soft-line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.period-flags input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--teal);
 }
 
 .period-heading h3,
@@ -1757,6 +1869,7 @@ td input {
   }
 
   .pacing-grid,
+  .teacher-control-panel,
   .playlist-grid,
   .library-grid {
     grid-template-columns: 1fr;

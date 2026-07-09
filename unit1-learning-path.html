@@ -72,6 +72,28 @@
       <span><strong>Optional</strong> 不阻擋 Unit 完成</span>
     </section>
 
+    <section class="teacher-control-panel" aria-label="Teacher playlist controls">
+      <div class="playlist-metric">
+        <span>Done</span>
+        <strong data-playlist-done>0 / 7</strong>
+        <p>7 節主幹進度</p>
+      </div>
+      <div class="playlist-metric">
+        <span>Assigned</span>
+        <strong data-playlist-assigned>0</strong>
+        <p>已指定給班級</p>
+      </div>
+      <div class="playlist-metric">
+        <span>Adjusted</span>
+        <strong data-playlist-adjusted>0</strong>
+        <p>壓縮、回家或紙本</p>
+      </div>
+      <div class="playlist-actions">
+        <span data-playlist-save-state>Saved locally</span>
+        <button class="mini-button" type="button" data-reset-playlist>Reset playlist</button>
+      </div>
+    </section>
+
     <section class="playlist-board" id="playlist" aria-labelledby="playlist-title">
       <div class="section-heading">
         <p class="eyebrow">Lesson Playlist</p>
@@ -80,7 +102,7 @@
       </div>
 
       <div class="playlist-grid">
-        <article class="playlist-period prep-period">
+        <article class="playlist-period prep-period" data-playlist-period="prep" data-period-kind="prep">
           <div class="period-heading">
             <span>Before Period 1</span>
             <h3>Vocabulary Preview</h3>
@@ -97,7 +119,7 @@
           </div>
         </article>
 
-        <article class="playlist-period">
+        <article class="playlist-period" data-playlist-period="p1" data-period-kind="core">
           <div class="period-heading">
             <span>Period 1</span>
             <h3>Dialogue Core</h3>
@@ -117,7 +139,7 @@
           <a class="mini-button" href="unit1-dialogue-task-check.html">Open Dialogue</a>
         </article>
 
-        <article class="playlist-period">
+        <article class="playlist-period" data-playlist-period="p2" data-period-kind="core">
           <div class="period-heading">
             <span>Period 2</span>
             <h3>Dialogue Output</h3>
@@ -136,7 +158,7 @@
           </div>
         </article>
 
-        <article class="playlist-period">
+        <article class="playlist-period" data-playlist-period="p3" data-period-kind="core">
           <div class="period-heading">
             <span>Period 3</span>
             <h3>Dialogue Fluency / Review</h3>
@@ -155,7 +177,7 @@
           </div>
         </article>
 
-        <article class="playlist-period">
+        <article class="playlist-period" data-playlist-period="p4" data-period-kind="core">
           <div class="period-heading">
             <span>Period 4</span>
             <h3>Grammar Bridge</h3>
@@ -174,7 +196,7 @@
           </div>
         </article>
 
-        <article class="playlist-period">
+        <article class="playlist-period" data-playlist-period="p5" data-period-kind="core">
           <div class="period-heading">
             <span>Period 5</span>
             <h3>Reading Core</h3>
@@ -193,7 +215,7 @@
           </div>
         </article>
 
-        <article class="playlist-period">
+        <article class="playlist-period" data-playlist-period="p6" data-period-kind="core">
           <div class="period-heading">
             <span>Period 6</span>
             <h3>Reading Output / Fluency</h3>
@@ -212,7 +234,7 @@
           </div>
         </article>
 
-        <article class="playlist-period">
+        <article class="playlist-period" data-playlist-period="p7" data-period-kind="core">
           <div class="period-heading">
             <span>Period 7</span>
             <h3>Unit Wrap / Accuracy Check</h3>
@@ -324,5 +346,6 @@
   </main>
 
   <script src="assets/js/app.js"></script>
+  <script src="assets/js/unit-path.js"></script>
 </body>
 </html>
