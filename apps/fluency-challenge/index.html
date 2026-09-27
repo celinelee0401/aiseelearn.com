@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#173f5f">
+    <title>Fluency Challenge</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./app.mjs"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="brand-bar">
+        <div>
+          <p class="eyebrow">CELINE'S ENGLISH CLASS</p>
+          <h1>Fluency Challenge</h1>
+        </div>
+        <button id="logoutButton" class="quiet-button hidden" type="button">完成並登出</button>
+      </header>
+
+      <section id="loginView" class="panel auth-panel">
+        <div class="intro">
+          <span class="step-tag">共用 iPad 安全登入</span>
+          <h2>準備好，把同一段話說得更順。</h2>
+          <p>輸入班級、座號與你在自主訂正中心共用的六位數 PIN。</p>
+        </div>
+        <form id="loginForm" class="form-grid" novalidate>
+          <label>學年<input id="schoolYear" inputmode="numeric" maxlength="4" value="115" required></label>
+          <label>班級<input id="classCode" inputmode="numeric" maxlength="12" autocomplete="off" required></label>
+          <label>座號<input id="seatNumber" inputmode="numeric" min="1" max="60" autocomplete="off" required></label>
+          <label>六位數 PIN<input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off" required></label>
+          <label class="wide">單元代碼<input id="unitId" maxlength="64" value="B2U3" autocomplete="off" required></label>
+          <div id="activationFields" class="wide activation-fields hidden">
+            <label>一次性啟用碼<input id="activationCode" maxlength="64" autocomplete="off"></label>
+            <label>再次輸入新 PIN<input id="pinConfirmation" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></label>
+          </div>
+          <p id="loginError" class="message error wide" role="alert"></p>
+          <button id="loginButton" class="primary-button wide" type="submit">登入並載入任務</button>
+          <button id="activationToggle" class="text-button wide" type="button">第一次使用？用啟用碼設定 PIN</button>
+        </form>
+      </section>
+
+      <section id="challengeView" class="panel hidden">
+        <div class="task-heading">
+          <div>
+            <p id="studentLabel" class="eyebrow"></p>
+            <h2 id="taskTitle">口說任務</h2>
+          </div>
+          <div id="roundBadge" class="round-badge">Round 1</div>
+        </div>
+
+        <div class="progress" aria-label="三輪進度">
+          <div class="progress-step active" data-round="1">1</div><div class="progress-line"></div>
+          <div class="progress-step" data-round="2">2</div><div class="progress-line"></div>
+          <div class="progress-step" data-round="3">3</div>
+        </div>
+
+        <article class="prompt-card">
+          <p class="eyebrow">YOUR SPEAKING PROMPT</p>
+          <p id="promptText">依照老師指定的題目完成口說。</p>
+        </article>
+
+        <section class="record-card">
+          <p id="timerLabel" class="timer-label">本輪時間</p>
+          <div id="timer" class="timer" aria-live="polite">--</div>
+          <button id="recordButton" class="record-button" type="button">
+            <span class="record-dot"></span><span id="recordButtonText">開始錄音</span>
+          </button>
+          <button id="discardRecordingButton" class="text-button hidden" type="button">放棄這次錄音，重新錄製</button>
+          <p id="recordMessage" class="message" role="status">請先想好內容，再按下開始。</p>
+        </section>
+
+        <section id="resultCard" class="result-card hidden" aria-live="polite">
+          <div class="result-heading">
+            <div><p class="eyebrow">ROUND EVIDENCE</p><h3>這一輪的口說證據</h3></div>
+            <audio id="playback" controls></audio>
+          </div>
+          <div id="metrics" class="metric-grid"></div>
+          <p id="assessmentNotice" class="assessment-notice hidden" role="status"></p>
+          <div class="transcript-block"><p class="eyebrow">辨識文字</p><p id="transcript"></p></div>
+          <p class="note">辨識文字是系統聽到的參考版本；分數用來看三輪變化，不代表英文能力總分。</p>
+          <button id="nextRoundButton" class="primary-button" type="button">進入下一輪</button>
+        </section>
+
+        <section id="completeCard" class="complete-card hidden">
+          <p class="eyebrow">CHALLENGE COMPLETE</p>
+          <h3>三輪都完成了！</h3>
+          <div id="roundSummary" class="summary-list"></div>
+          <button id="finishButton" class="primary-button" type="button">完成並登出</button>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

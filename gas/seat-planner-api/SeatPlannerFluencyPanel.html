@@ -1,0 +1,328 @@
+<script type="text/babel">
+function FluencyPanel({ className, token, onAuthFailure }) {
+  const [unitId, setUnitId] = React.useState("B2U3");
+  const [settings, setSettings] = React.useState(null);
+  const [progress, setProgress] = React.useState(null);
+  const [selectedSeat, setSelectedSeat] = React.useState(null);
+  const [busy, setBusy] = React.useState("");
+  const [message, setMessage] = React.useState("");
+  const [dirty, setDirty] = React.useState(false);
+  const saveRequestId = React.useRef(null);
+  const selectedStudent = progress && progress.students.find((student) => student.seatNumber === selectedSeat);
+
+  React.useEffect(() => {
+    setProgress(null);
+    setSelectedSeat(null);
+  }, [className]);
+
+  const callGas = React.useCallback((method, ...args) => new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler(resolve)
+      .withFailureHandler((error) => {
+        const detail = error && error.message ? error.message : "";
+        if (typeof onAuthFailure === "function" && /(登入|驗證|權限|未授權|只有教師|session|token)/i.test(detail)) {
+          onAuthFailure(error);
+        }
+        reject(error);
+      })[method](...args);
+  }), [onAuthFailure]);
+
+  const showError = (error) => {
+    setMessage(error && error.message ? error.message : "Fluency Challenge 服務暫時無法使用。");
+  };
+
+  const loadSettings = React.useCallback(async () => {
+    setBusy("load");
+    setMessage("");
+    try {
+      const value = await callGas("getFluencyUnitSettings", className, unitId, token);
+      const normalizedValue = {
+        ...value,
+        isNew: Boolean(value.isNew || value.configVersion === "draft")
+      };
+      setSettings(normalizedValue);
+      setDirty(false);
+      saveRequestId.current = null;
+      setMessage(normalizedValue.isNew
+        ? `${normalizedValue.unitId} 尚未建立，已帶入預設四軌時間。請填寫內容後建立單元。`
+        : `已載入 ${normalizedValue.unitId}。`);
+    } catch (error) {
+      showError(error);
+    } finally {
+      setBusy("");
+    }
+  }, [callGas, className, token, unitId]);
+
+  const updateSettings = (updater) => {
+    saveRequestId.current = null;
+    setDirty(true);
+    setSettings((current) => updater(current));
+  };
+
+  const saveSettings = async () => {
+    if (!settings) return;
+    const creating = Boolean(settings.isNew);
+    setBusy("save");
+    setMessage("");
+    saveRequestId.current = saveRequestId.current || createFluencyRequestId("SAVE");
+    try {
+      const value = await callGas(
+        "saveFluencyUnitSettings",
+        className,
+        unitId,
+        settings,
+        token,
+        saveRequestId.current
+      );
+      setSettings({ ...value, isNew: false });
+      setDirty(false);
+      saveRequestId.current = null;
+      setMessage(creating
+        ? `已建立 ${value.unitId}。現在可以開始本班活動。`
+        : "已儲存。新時間會在下一次開始活動時凍結成快照。");
+    } catch (error) {
+      showError(error);
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const startRun = async () => {
+    setBusy("start");
+    setMessage("");
+    try {
+      const run = await callGas(
+        "startFluencyRunSnapshot",
+        className,
+        unitId,
+        token,
+        createFluencyRequestId("RUN")
+      );
+      setMessage(run.created
+        ? `已開始 ${run.unitId}，共 ${run.assignmentCount} 位學生。`
+        : `${run.unitId} 已有開放中的活動，已繼續使用原快照。`);
+      await refreshProgress();
+    } catch (error) {
+      showError(error);
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const closeRun = async () => {
+    if (!window.confirm(`確定結束 ${className} 班 ${unitId} 的 Fluency Challenge？\n結束後學生將無法繼續送出錄音。`)) return;
+    setBusy("close");
+    setMessage("");
+    try {
+      const result = await callGas(
+        "closeFluencyRun",
+        className,
+        unitId,
+        token,
+        createFluencyRequestId("CLOSE")
+      );
+      setProgress(null);
+      setMessage(result.status === "closed"
+        ? `已結束 ${result.unitId} 活動。`
+        : `${result.unitId} 目前沒有開放中的活動。`);
+    } catch (error) {
+      showError(error);
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const refreshProgress = async () => {
+    setBusy((current) => current || "progress");
+    try {
+      setProgress(await callGas("getFluencyRunProgress", className, unitId, token));
+    } catch (error) {
+      showError(error);
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const updateRule = (track, updater) => updateSettings((current) => ({
+    ...current,
+    tracks: current.tracks.map((rule) => rule.track === track ? updater(rule) : rule)
+  }));
+
+  return (
+    <section className="teacher-only rounded-3xl border border-sky-200 bg-white p-5 shadow-sm">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <div className="text-xs font-black uppercase tracking-[0.18em] text-sky-600">Fluency Challenge</div>
+          <h2 className="mt-1 text-xl font-black text-slate-800">單元設定與班級進度</h2>
+          <p className="mt-1 text-sm text-slate-500">軌別由座位表指定；學生端不會看到軌別名稱。</p>
+        </div>
+        <div className="flex gap-2">
+          <input
+            className="w-28 rounded-xl border border-slate-300 px-3 py-2 font-bold uppercase"
+            value={unitId}
+            maxLength="64"
+            onChange={(event) => {
+              setUnitId(event.target.value.toUpperCase());
+              setSettings(null);
+              setProgress(null);
+              setSelectedSeat(null);
+              setDirty(false);
+              saveRequestId.current = null;
+            }}
+            aria-label="單元代碼"
+          />
+          <button className="rounded-xl bg-slate-800 px-4 py-2 font-bold text-white disabled:opacity-50" disabled={Boolean(busy)} onClick={loadSettings}>
+            載入單元
+          </button>
+        </div>
+      </div>
+
+      {settings && (
+        <div className="mt-5 space-y-4">
+          {settings.isNew && (
+            <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900" role="status">
+              新單元：目前只是草稿，尚未寫入資料庫。
+            </div>
+          )}
+          <label className="block text-sm font-bold text-slate-700">
+            活動標題
+            <input className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 font-normal" value={settings.title}
+              onChange={(event) => updateSettings((value) => ({ ...value, title: event.target.value }))} />
+          </label>
+          <label className="block text-sm font-bold text-slate-700">
+            口說任務／題目
+            <textarea className="mt-1 min-h-24 w-full rounded-xl border border-slate-300 px-3 py-2 font-normal" value={settings.promptText || ""}
+              onChange={(event) => updateSettings((value) => ({ ...value, promptText: event.target.value }))} />
+          </label>
+
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {settings.tracks.map((rule) => (
+              <div key={rule.track} className="rounded-2xl bg-sky-50 p-4">
+                <div className="flex items-center justify-between">
+                  <strong className="text-lg text-slate-800">{rule.track}</strong>
+                  <label className="text-xs font-bold text-slate-600">
+                    <input type="checkbox" className="mr-1" checked={rule.useDefault}
+                      onChange={(event) => updateRule(rule.track, (value) => ({ ...value, useDefault: event.target.checked }))} />
+                    使用預設
+                  </label>
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {rule.rounds.map((seconds, index) => (
+                    <label key={index} className="text-center text-xs font-bold text-slate-500">
+                      R{index + 1}
+                      <input type="number" min="5" max="180" step="1" disabled={rule.useDefault}
+                        className="mt-1 w-full rounded-lg border border-sky-200 px-2 py-2 text-center text-base font-black text-slate-800 disabled:bg-slate-100"
+                        value={seconds}
+                        onChange={(event) => updateRule(rule.track, (value) => ({
+                          ...value,
+                          rounds: value.rounds.map((item, roundIndex) => roundIndex === index ? Number(event.target.value) : item)
+                        }))} />
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button className="rounded-xl bg-sky-600 px-4 py-2 font-black text-white disabled:opacity-50" disabled={Boolean(busy)} onClick={saveSettings}>
+              {settings.isNew ? "建立並儲存單元" : "儲存單元設定"}
+            </button>
+            <button className="rounded-xl bg-emerald-600 px-4 py-2 font-black text-white disabled:opacity-50"
+              disabled={Boolean(busy) || dirty || settings.isNew}
+              title={settings.isNew ? "請先建立並儲存單元" : (dirty ? "請先儲存單元設定" : "")} onClick={startRun}>
+              開始本班活動
+            </button>
+            <button className="rounded-xl border border-slate-300 px-4 py-2 font-bold text-slate-700 disabled:opacity-50" disabled={Boolean(busy)} onClick={refreshProgress}>
+              更新進度
+            </button>
+            <button className="rounded-xl border border-rose-300 px-4 py-2 font-bold text-rose-700 disabled:opacity-50" disabled={Boolean(busy)} onClick={closeRun}>
+              結束本班活動
+            </button>
+          </div>
+        </div>
+      )}
+
+      {message && <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-sm font-bold text-amber-900" role="status">{message}</p>}
+
+      {progress && (
+        <div className="mt-5">
+          <div className="mb-2 text-sm font-black text-slate-700">座號進度（最新開放活動）</div>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+            {progress.students.map((student) => (
+              <button key={student.seatNumber} type="button"
+                className={`rounded-xl border p-3 text-left focus:outline-none focus:ring-2 focus:ring-sky-500 ${selectedSeat === student.seatNumber ? "border-sky-500 bg-sky-50" : "border-slate-200 bg-white"}`}
+                aria-expanded={selectedSeat === student.seatNumber}
+                aria-controls={selectedSeat === student.seatNumber ? "fluency-score-details" : undefined}
+                onClick={() => setSelectedSeat((current) => current === student.seatNumber ? null : student.seatNumber)}>
+                <strong className="text-slate-800">{String(student.seatNumber).padStart(2, "0")} 號</strong>
+                <span className="mt-2 flex gap-1">
+                  {student.rounds.map((round) => (
+                    <span key={round.round} title={fluencyRoundTitle(round)}
+                      className={`rounded-full px-2 py-1 text-xs font-black ${round.completed ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-400"}`}>
+                      R{round.round}{round.completed ? "✓" : "○"}
+                    </span>
+                  ))}
+                </span>
+                <span className="mt-2 block text-xs font-bold text-sky-700">{selectedSeat === student.seatNumber ? "收起評分" : "查看三輪評分"}</span>
+              </button>
+            ))}
+          </div>
+          {selectedStudent && (
+            <section id="fluency-score-details" role="region" aria-labelledby="fluency-score-heading"
+              className="mt-4 rounded-2xl border border-sky-200 bg-sky-50 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <h3 id="fluency-score-heading" className="text-lg font-black text-slate-800">
+                  {String(selectedStudent.seatNumber).padStart(2, "0")} 號｜三輪評分
+                </h3>
+                <button type="button" className="rounded-lg border border-sky-300 px-3 py-1 text-sm font-bold text-sky-800"
+                  onClick={() => setSelectedSeat(null)}>關閉</button>
+              </div>
+              <p className="mt-1 text-xs text-slate-600">以下指標用來比較三輪變化，不是英語能力總分。</p>
+              <div className="mt-3 grid gap-3 md:grid-cols-3">
+                {selectedStudent.rounds.map((round) => (
+                  <div key={round.round} className="rounded-xl border border-sky-100 bg-white p-3">
+                    <h4 className="font-black text-slate-800">Round {round.round}</h4>
+                    {round.completed ? (
+                      <dl className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                        <div><dt className="text-slate-500">語速</dt><dd className="font-bold text-slate-800">{fluencyScoreValue(round.wpm)} WPM</dd></div>
+                        <div><dt className="text-slate-500">停頓流暢</dt><dd className="font-bold text-slate-800">{fluencyScoreValue(round.pauseFlow)}</dd></div>
+                        <div><dt className="text-slate-500">發音清晰</dt><dd className="font-bold text-slate-800">{fluencyScoreValue(round.pronunciationAccuracy)}</dd></div>
+                        <div><dt className="text-slate-500">語調節奏</dt><dd className="font-bold text-slate-800">{fluencyScoreValue(round.prosody)}</dd></div>
+                      </dl>
+                    ) : <p className="mt-2 text-sm text-slate-500">尚未完成</p>}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function createFluencyRequestId(kind) {
+  const random = typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  return `FLUENCY-${kind}-${random}`;
+}
+
+function fluencyRoundTitle(round) {
+  if (!round.completed) return `Round ${round.round}：尚未完成`;
+  const values = [
+    round.wpm == null ? null : `WPM ${Math.round(round.wpm)}`,
+    round.pauseFlow == null ? null : `停頓流暢 ${Math.round(round.pauseFlow)}`,
+    round.pronunciationAccuracy == null ? null : `發音清晰 ${Math.round(round.pronunciationAccuracy)}`,
+    round.prosody == null ? null : `韻律 ${Math.round(round.prosody)}`
+  ].filter(Boolean);
+  return `Round ${round.round}：${values.join("／") || "已完成"}`;
+}
+
+function fluencyScoreValue(value) {
+  if (value === null || value === undefined || value === "") return "—";
+  const number = Number(value);
+  return Number.isFinite(number) ? String(Math.round(number * 10) / 10) : "—";
+}
+</script>

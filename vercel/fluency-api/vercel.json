@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "functions": {
+    "api/*.ts": { "maxDuration": 60 }
+  },
+  "rewrites": [
+    { "source": "/api/fluency/auth/login", "destination": "/api/handler?__fluency_path=/api/fluency/auth/login" },
+    { "source": "/api/fluency/auth/logout", "destination": "/api/handler?__fluency_path=/api/fluency/auth/logout" },
+    { "source": "/api/fluency/session", "destination": "/api/handler?__fluency_path=/api/fluency/session" },
+    { "source": "/api/fluency/task", "destination": "/api/handler?__fluency_path=/api/fluency/task" },
+    { "source": "/api/fluency/assess", "destination": "/api/handler?__fluency_path=/api/fluency/assess" },
+    { "source": "/api/internal/student-identity", "destination": "/api/handler?__fluency_path=/api/internal/student-identity" },
+    { "source": "/api/internal/fluency-task", "destination": "/api/handler?__fluency_path=/api/internal/fluency-task" },
+    { "source": "/api/internal/fluency-attempt", "destination": "/api/handler?__fluency_path=/api/internal/fluency-attempt" },
+    { "source": "/api/internal/fluency-runs", "destination": "/api/handler?__fluency_path=/api/internal/fluency-runs" },
+    { "source": "/api/internal/fluency-teacher", "destination": "/api/handler?__fluency_path=/api/internal/fluency-teacher" }
+  ]
+}

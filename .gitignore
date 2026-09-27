@@ -1,0 +1,19 @@
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# macOS and editor files
+.DS_Store
+*.swp
+*.swo
+
+# Logs and temporary output
+*.log
+tmp/
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+.netlify/
