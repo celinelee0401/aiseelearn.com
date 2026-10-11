@@ -6,7 +6,7 @@
 
 - 正式座位表版本 8 加入每日 06:00 唯讀資料庫喚醒；**Celine 需在 Apps Script 編輯器執行一次 `installFluencyKeepAliveTrigger`** 才會真正排程。
 - 正式鏈路已用真實資料確認跑通（詳見 `docs/fluency-classroom-readiness-2026-09-19.md` 最上方一節）；9 月的 3 個活動仍開放中。
-- 學生端「結果聚焦進步」：新增 `apps/fluency-challenge/lib/round-comparison.mjs`；每輪結果顯示與上一輪的變化、完成頁有三輪對照表與「進步最多」標語；語速只顯示趨勢不評好壞。90 項測試通過，**尚未部署**（staging 部署被安全機制擋下，待核准）。
+- 學生端「結果聚焦進步」：新增 `apps/fluency-challenge/lib/round-comparison.mjs`；每輪結果顯示與上一輪的變化、完成頁有三輪對照表與「進步最多」標語；語速只顯示趨勢不評好壞。90 項測試通過；已由 Celine 部署至 staging（deploy `6acb60b6dc72e5c68b133431`），冒煙檢查通過，待 DEMO 學生實測後再決定是否上正式站。
 
 ## 2026-10-11 晚：教師 Fluency 面板改版
 
