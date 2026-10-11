@@ -32,7 +32,7 @@ function createGasRuntime() {
     __sheetReads: 0,
     __role: "teacher",
     __outbound: null,
-    console: { error() {} },
+    console: { error() {}, log() {} },
     PropertiesService: {
       getScriptProperties() {
         return {
@@ -408,4 +408,15 @@ test("a teacher can close the current run without exposing its database id", () 
   assert.equal(context.__outbound.body.request.action, "closeFluencyRun");
   assert.equal("runId" in result, false);
   assert.equal("studentId" in result, false);
+});
+
+test("database keep-alive sends one signed read-only lookup and throttles repeats", () => {
+  const context = createGasRuntime();
+  assert.equal(context.fluencyDatabaseKeepAlive(), undefined);
+  assert.equal(context.__outbound.body.request.action, "getFluencyUnitSettings");
+  assert.equal(context.__outbound.url, "https://fluency-service.fictional.invalid/api/internal/fluency-teacher");
+  assert.equal(context.__outbound.body.gateway.signature.length, 43);
+  context.__outbound = null;
+  context.fluencyDatabaseKeepAlive();
+  assert.equal(context.__outbound, null);
 });

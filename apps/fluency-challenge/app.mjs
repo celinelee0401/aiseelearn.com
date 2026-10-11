@@ -10,6 +10,13 @@ import {
 } from "./lib/round-progress.mjs";
 import { urlWithUnit } from "./lib/unit-url.mjs";
 import { canRetryAssessment, createAssessmentForm } from "./lib/assessment-retry.mjs";
+import {
+  biggestGain,
+  compareRounds,
+  formatDelta,
+  previousResult,
+  progressHeadline
+} from "./lib/round-comparison.mjs";
 
 const api = Object.freeze({
   login: "/api/fluency/auth/login",
@@ -26,7 +33,7 @@ const elements = Object.fromEntries([
   "taskTitle", "roundBadge", "promptText", "timerLabel", "timer", "recordButton",
   "recordButtonText", "recordMessage", "resultCard", "metrics", "transcript", "playback",
   "assessmentNotice", "nextRoundButton", "completeCard", "roundSummary", "finishButton",
-  "discardRecordingButton"
+  "discardRecordingButton", "progressHeadline", "growthHeadline"
 ].map((id) => [id, document.getElementById(id)]));
 
 const state = {
@@ -285,13 +292,17 @@ function showResult_(result) {
   elements.playback.src = result.audioUrl;
   elements.transcript.textContent = result.assessment.transcript
     || (isFlowCheck ? "測試模式尚未啟用語音辨識。" : "未取得可顯示的辨識文字。");
+  const comparisons = compareRounds(result, previousResult(state.results, result.round));
+  elements.progressHeadline.textContent = isFlowCheck ? "" : progressHeadline(comparisons);
   elements.metrics.replaceChildren(
-    metric_("實際錄音", formatDuration_(result.assessment.durationMs, result.timeLimitSeconds)),
-    metric_("語速", `${display_(result.assessment.metrics?.pace?.wpm)} WPM`),
-    metric_("停頓流暢", display_(result.assessment.metrics?.pauseFlow?.score)),
-    metric_("發音清晰", display_(result.assessment.metrics?.pronunciationAccuracy?.score)),
-    metric_("語調節奏", display_(result.assessment.metrics?.prosody?.score))
+    ...comparisons.map((item) => metric_(
+      item.label,
+      item.unit ? `${display_(item.value)} ${item.unit}` : display_(item.value),
+      item
+    )),
+    metric_("實際錄音", formatDuration_(result.assessment.durationMs, result.timeLimitSeconds))
   );
+  elements.recordButton.closest(".record-card").classList.add("hidden");
   showAssessmentNotice_(result.assessment);
   elements.nextRoundButton.textContent = firstIncompleteRoundIndex(state.task.rounds, state.completedRounds) < 0
     ? "查看三輪結果"
@@ -318,29 +329,13 @@ function showComplete_() {
     step.classList.add("done");
     step.classList.remove("active");
   });
-  elements.roundSummary.replaceChildren(...state.task.rounds.map((round) => {
-    const result = state.results.find((value) => value.round === round.round);
-    const row = document.createElement("div");
-    row.className = "summary-row";
-    if (result) {
-      const reviewRequired = assessmentNeedsReview_(result.assessment);
-      row.classList.toggle("needs-review", reviewRequired);
-      row.append(
-        text_("strong", `Round ${result.round}`),
-        text_("span", `用時 ${formatDuration_(result.assessment.durationMs, result.timeLimitSeconds)}`),
-        text_("span", `${display_(result.assessment.metrics?.pace?.wpm)} WPM`),
-        text_("span", `流暢 ${display_(result.assessment.metrics?.pauseFlow?.score)}`),
-        text_("span", `發音 ${display_(result.assessment.metrics?.pronunciationAccuracy?.score)}`),
-        ...(reviewRequired ? [text_("span", "⚠️ 需複核")] : [])
-      );
-    } else {
-      row.append(
-        text_("strong", `Round ${round.round}`),
-        text_("span", state.completedRounds.includes(round.round) ? "已完成" : "尚未完成")
-      );
-    }
-    return row;
-  }));
+  const results = state.task.rounds.map((round) => state.results.find((value) => value.round === round.round) || null);
+  const completedResults = results.filter(Boolean);
+  const gain = biggestGain(completedResults);
+  elements.growthHeadline.textContent = gain
+    ? `三輪下來，你進步最多的是「${gain.label}」：${formatDelta(gain.delta)}`
+    : "你完成了三輪練習。每說一次，都在讓同一段話更順。";
+  elements.roundSummary.replaceChildren(summaryTable_(results));
   elements.completeCard.classList.remove("hidden");
 }
 
@@ -432,11 +427,49 @@ function restoredResults_(attempts) {
   }));
 }
 
-function metric_(label, value) {
+function metric_(label, value, comparison = null) {
   const item = document.createElement("div");
   item.className = "metric";
   item.append(text_("span", label), text_("strong", value));
+  if (comparison?.direction) {
+    const tone = comparison.neutral || comparison.direction === "same" ? "neutral" : comparison.direction;
+    const delta = text_("em", `${formatDelta(comparison.delta)}`);
+    delta.className = `metric-delta ${tone}`;
+    delta.title = "和上一輪相比";
+    item.append(delta);
+  }
   return item;
+}
+
+function summaryTable_(results) {
+  const table = document.createElement("table");
+  table.className = "summary-table";
+  const head = document.createElement("tr");
+  head.append(text_("th", ""), ...results.map((result, index) => {
+    const cell = text_("th", `R${index + 1}`);
+    if (result && assessmentNeedsReview_(result.assessment)) cell.textContent += " ⚠️";
+    return cell;
+  }), text_("th", "變化"));
+  const firstResult = results.find(Boolean) || null;
+  const lastResult = [...results].reverse().find(Boolean) || null;
+  const totals = firstResult && lastResult && firstResult !== lastResult
+    ? compareRounds(lastResult, firstResult)
+    : [];
+  const rows = compareRounds(null, null).map((metric) => {
+    const row = document.createElement("tr");
+    row.append(text_("th", metric.unit ? `${metric.label} ${metric.unit}` : metric.label));
+    for (const result of results) {
+      const value = result ? compareRounds(result, null).find((item) => item.key === metric.key).value : null;
+      row.append(text_("td", display_(value)));
+    }
+    const total = totals.find((item) => item.key === metric.key);
+    const change = text_("td", total?.direction ? formatDelta(total.delta) : "—");
+    change.className = total?.direction && !total.neutral && total.direction !== "same" ? total.direction : "neutral";
+    row.append(change);
+    return row;
+  });
+  table.append(head, ...rows);
+  return table;
 }
 
 function text_(tag, value) {

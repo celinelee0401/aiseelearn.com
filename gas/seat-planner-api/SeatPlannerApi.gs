@@ -393,3 +393,41 @@ function fluencySeatJsonOutput_(payload) {
     .createTextOutput(JSON.stringify(payload))
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+/**
+ * Keep the free-tier Supabase project awake. A time trigger calls this once a
+ * day; it performs one signed, read-only unit-settings lookup and returns
+ * nothing, so web visitors calling it gain no data. A short cache lock limits
+ * repeated calls to one database read every ten minutes.
+ */
+function fluencyDatabaseKeepAlive() {
+  var cache = CacheService.getScriptCache();
+  if (cache.get('fluency-keepalive-lock')) return;
+  cache.put('fluency-keepalive-lock', '1', 600);
+  var request = {
+    schemaVersion: '1.0',
+    requestId: normalizeFluencyRequestId_('', 'FLUENCY-KEEPALIVE-'),
+    action: 'getFluencyUnitSettings',
+    unitId: FLUENCY_KEEPALIVE_UNIT_ID
+  };
+  try {
+    fluencyPostService_(FLUENCY_TEACHER_API, request, '資料庫喚醒');
+    console.log('Fluency keep-alive succeeded.');
+  } catch (error) {
+    console.error('Fluency keep-alive failed: ' + (error && error.message ? error.message : 'unknown error'));
+    throw error;
+  }
+}
+
+/** Run once from the Apps Script editor to install the daily keep-alive trigger. */
+function installFluencyKeepAliveTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function(trigger) {
+    if (trigger.getHandlerFunction() === 'fluencyDatabaseKeepAlive') ScriptApp.deleteTrigger(trigger);
+  });
+  ScriptApp.newTrigger('fluencyDatabaseKeepAlive').timeBased().everyDays(1).atHour(6).create();
+  CacheService.getScriptCache().remove('fluency-keepalive-lock');
+  fluencyDatabaseKeepAlive();
+  return '已安裝每日 06:00 資料庫喚醒，並完成一次測試讀取。';
+}
+
+var FLUENCY_KEEPALIVE_UNIT_ID = 'B2U3';

@@ -75,6 +75,7 @@
             <div><p class="eyebrow">ROUND EVIDENCE</p><h3>這一輪的口說證據</h3></div>
             <audio id="playback" controls></audio>
           </div>
+          <p id="progressHeadline" class="progress-headline"></p>
           <div id="metrics" class="metric-grid"></div>
           <p id="assessmentNotice" class="assessment-notice hidden" role="status"></p>
           <div class="transcript-block"><p class="eyebrow">辨識文字</p><p id="transcript"></p></div>
@@ -85,7 +86,9 @@
         <section id="completeCard" class="complete-card hidden">
           <p class="eyebrow">CHALLENGE COMPLETE</p>
           <h3>三輪都完成了！</h3>
-          <div id="roundSummary" class="summary-list"></div>
+          <p id="growthHeadline" class="progress-headline"></p>
+          <div id="roundSummary" class="summary-table-wrap"></div>
+          <p class="note">分數用來看自己三輪的變化；語速只看趨勢，沒有好壞之分。</p>
           <button id="finishButton" class="primary-button" type="button">完成並登出</button>
         </section>
       </section>

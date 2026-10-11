@@ -1,6 +1,13 @@
 # Fluency Challenge｜下週課堂使用前檢查（2026-09-19）
 
-## 2026-09-21 正式站更新（以本節為最新狀態）
+## 2026-10-11 正式鏈路查核與資料庫喚醒（以本節為最新狀態）
+
+- 正式座位表（115-1）已能載入單元設定；唯讀查核正式 Supabase：2 個單元、3 個開放中活動（816 B3U2 09-22、801 B3U2 09-24、801 B3U1 09-24）、84 筆 assignment、3 筆 attempt。801 B3U2 於 09-24 有一位學生完成 R1–R3，`assessment_provider = azure-speech-pronunciation`，WPM／停頓流暢／發音清晰／語調節奏皆有分數。**正式「教師開活動 → 學生登入錄音 → Azure 評分 → 存檔」已實際跑通。**
+- 三個活動自 9 月起仍為開放；是否結束由教師決定。
+- 正式 Supabase 仍為 Free；已在 115-1 座位表加入每日唯讀喚醒（版本 8），需擁有者在 Apps Script 編輯器執行一次 `installFluencyKeepAliveTrigger` 完成授權與排程。
+- 學生端「結果聚焦進步」已完成本機開發與 90 項測試，尚未部署（staging 部署需擁有者核准）。
+
+## 2026-09-21 正式站更新
 
 - 擁有者已輪替 Azure Speech Key2，並自行在正式 Netlify 站將 `AZURE_SPEECH_KEY` 設為 secret；唯讀查核確認 production context 有值，未讀取金鑰明文。正式站另已設定 `AZURE_SPEECH_RECOGNITION_URL` 為 East Asia 辨識端點，並再次唯讀確認。`FLUENCY_ASSESSMENT_MODE=azure`、連續評測開啟、增強轉錄關閉；增強轉錄所需的資源端點目前非必要。
 - 73 項 Fluency 本機測試與 Netlify TypeScript 型別檢查通過。以明確白名單重新打包學生頁與 10 個 Fluency Functions，於 2026-09-21 發布至正式 `https://fluency-challenge.netlify.app/`；部署 ID `6ab09745b7561c1e1af6c156`，Netlify 顯示 ready、production、current。原舊版部署 ID `69e031990264cbb5b3a17e59` 保留作應用回退基準，不修改正式資料庫或清除學生成績。

@@ -101,6 +101,13 @@ panel. Only the panel was merged with `mergeTeacherPanel()` (additions only;
 other files byte-identical) and deployed as version 7 on the same deployment
 ID. Re-merge the panel whenever the planner UI is redeployed.
 
+On 2026-10-11 (evening) the 115-1 planner also received `fluencyDatabaseKeepAlive()`
+and `installFluencyKeepAliveTrigger()` (deployment version 8). The keep-alive
+sends one signed, read-only `getFluencyUnitSettings` lookup through the existing
+production teacher service so the free-tier production Supabase project is not
+paused after seven idle days. The owner must run `installFluencyKeepAliveTrigger`
+once from the Apps Script editor to authorize and create the daily 06:00 trigger.
+
 ## Isolated staging bundle
 
 `scripts/build-seat-planner-staging-bundle.mjs` merges this patch into an exported
