@@ -9,6 +9,7 @@ function FluencyPanel({ className, token, onAuthFailure }) {
   const [seatFilter, setSeatFilter] = React.useState("all");
   const [settingsOpen, setSettingsOpen] = React.useState(true);
   const [autoRefresh, setAutoRefresh] = React.useState(false);
+  const [confirmingClose, setConfirmingClose] = React.useState(false);
   const [busy, setBusy] = React.useState("");
   const [message, setMessage] = React.useState(null);
   const [dirty, setDirty] = React.useState(false);
@@ -27,6 +28,7 @@ function FluencyPanel({ className, token, onAuthFailure }) {
     setSelectedSeat(null);
     setDirty(false);
     setSettingsOpen(true);
+    setConfirmingClose(false);
     saveRequestId.current = null;
   };
 
@@ -168,10 +170,9 @@ function FluencyPanel({ className, token, onAuthFailure }) {
     }
   };
 
+  // Apps Script iframes and embedded browsers may suppress window.confirm, so confirm inside the panel.
   const closeRun = async () => {
-    const pending = summary.total - summary.done;
-    const warning = pending > 0 ? `\n目前還有 ${pending} 位學生未完成三輪。` : "";
-    if (!window.confirm(`確定結束 ${className} 班 ${unitId} 的 Fluency Challenge？${warning}\n結束後學生將無法繼續送出錄音。`)) return;
+    setConfirmingClose(false);
     setBusy("close");
     setMessage(null);
     try {
@@ -353,9 +354,22 @@ function FluencyPanel({ className, token, onAuthFailure }) {
                 <input type="checkbox" checked={autoRefresh} onChange={(event) => setAutoRefresh(event.target.checked)} />
                 每 {FLUENCY_AUTO_REFRESH_MS / 1000} 秒自動更新
               </label>
-              <button type="button" className="ml-auto rounded-xl border border-rose-300 px-4 py-2 font-bold text-rose-700 disabled:opacity-50" disabled={Boolean(busy)} onClick={closeRun}>
+              <button type="button" className="ml-auto rounded-xl border border-rose-300 px-4 py-2 font-bold text-rose-700 disabled:opacity-50" disabled={Boolean(busy) || confirmingClose} onClick={() => setConfirmingClose(true)}>
                 {busy === "close" ? "結束中…" : "結束本班活動"}
               </button>
+              {confirmingClose && (
+                <div className="w-full rounded-xl border border-rose-300 bg-rose-50 p-3 text-sm text-rose-900" role="alertdialog" aria-labelledby="fluency-close-confirm">
+                  <p id="fluency-close-confirm" className="font-black">確定結束 {className} 班 {unitId} 的 Fluency Challenge？</p>
+                  <p className="mt-1">
+                    {summary.total - summary.done > 0 ? `目前還有 ${summary.total - summary.done} 位學生未完成三輪。` : "全班都已完成三輪。"}
+                    結束後學生將無法繼續送出錄音。
+                  </p>
+                  <div className="mt-2 flex gap-2">
+                    <button type="button" className="rounded-lg bg-rose-600 px-4 py-2 font-black text-white disabled:opacity-50" disabled={Boolean(busy)} onClick={closeRun}>確定結束</button>
+                    <button type="button" className="rounded-lg border border-slate-300 bg-white px-4 py-2 font-bold text-slate-700" onClick={() => setConfirmingClose(false)}>取消</button>
+                  </div>
+                </div>
+              )}
             </>
           )}
           {dirty && runState !== "open" && !settings.isNew && <span className="text-xs font-bold text-amber-700">請先儲存單元設定，才能開始活動。</span>}

@@ -11,7 +11,7 @@
 ## 2026-10-11 晚：教師 Fluency 面板改版
 
 - 已改寫 `gas/seat-planner-api/SeatPlannerFluencyPanel.html`：三步驟列、活動狀態徽章、可收合設定與秒數檢查、全班完成摘要＋篩選、精簡座號卡、三輪對照表含「R1→最新」變化（WPM 不上色）。後端呼叫與資料契約不變；相關 11 項測試通過。
-- 已部署：staging 座位表版本 7；正式 115-1 座位表（指令碼 ID 見 `gas/seat-planner-api/README.md`）版本 7。Celine 已登入確認正式面板可見並可載入單元。
+- 已部署：staging 座位表版本 8；正式 115-1 座位表版本 9（結束活動改面板內確認）；原先版本 7 為（指令碼 ID 見 `gas/seat-planner-api/README.md`）版本 7。Celine 已登入確認正式面板可見並可載入單元。
 - 正式座位表版本 6 曾覆蓋掉面板；**以後座位表改版重新部署，必須再用 `mergeTeacherPanel()` 合併面板**。
 - 變更一律在 Fluency 專用分支的乾淨 checkout 提交（scratchpad clone），不要在本地混雜的 `main` 提交。
 - Supabase `fluency-challenge-staging` 是免費方案，閒置 7 天會暫停；正式庫已改用定時喚醒（見上一節）。
