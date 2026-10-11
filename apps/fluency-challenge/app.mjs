@@ -332,10 +332,13 @@ function showComplete_() {
   const results = state.task.rounds.map((round) => state.results.find((value) => value.round === round.round) || null);
   const completedResults = results.filter(Boolean);
   const gain = biggestGain(completedResults);
-  elements.growthHeadline.textContent = gain
-    ? `三輪下來，你進步最多的是「${gain.label}」：${formatDelta(gain.delta)}`
-    : "你完成了三輪練習。每說一次，都在讓同一段話更順。";
-  elements.roundSummary.replaceChildren(summaryTable_(results));
+  const hasScores = completedResults.some((result) => compareRounds(result, null).some((item) => item.value !== null));
+  elements.growthHeadline.textContent = !hasScores
+    ? "這個活動的三輪已經完成，但沒有可顯示的分數（可能是測試模式）。如需重新練習，請老師開新的活動。"
+    : gain
+      ? `三輪下來，你進步最多的是「${gain.label}」：${formatDelta(gain.delta)}`
+      : "你完成了三輪練習。每說一次，都在讓同一段話更順。";
+  elements.roundSummary.replaceChildren(...(hasScores ? [summaryTable_(results)] : []));
   elements.completeCard.classList.remove("hidden");
 }
 
