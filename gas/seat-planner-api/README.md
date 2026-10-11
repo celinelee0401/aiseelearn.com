@@ -89,6 +89,18 @@ reads the effective timing rules. The production planner remains unchanged.
 The teacher password itself still must be entered by the owner through the
 one-time setup page; it is never generated, viewed, or stored by the build tool.
 
+On 2026-10-11 the redesigned teacher Fluency panel (step bar, run-status badge,
+collapsible settings with validation, class progress summary and filters,
+compact seat cards, and a round-comparison score table) replaced only the
+`FluencyPanel` block in the staging project and was deployed as staging
+version 7 on the same deployment ID. Later the same day, after the owner's explicit approval,
+the panel was restored to the 115-1 production planner (script ID
+`1DzstRGyv5iun4d4D3vmsTBNdh4Td2Eb0AnKg1dL1rJZTQyqvuSLa3aKC`). Its version 6
+(「討論座形與同軌桌調整」) had overwritten `SeatPlannerUI.html` without the
+panel. Only the panel was merged with `mergeTeacherPanel()` (additions only;
+other files byte-identical) and deployed as version 7 on the same deployment
+ID. Re-merge the panel whenever the planner UI is redeployed.
+
 ## Isolated staging bundle
 
 `scripts/build-seat-planner-staging-bundle.mjs` merges this patch into an exported

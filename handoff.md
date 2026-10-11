@@ -1,6 +1,15 @@
 # Fluency Challenge 收工交接
 
-最後更新：2026-10-11（Asia/Taipei）；最後更新者：Codex
+最後更新：2026-10-11 晚（Asia/Taipei）；最後更新者：Claude Code
+
+## 2026-10-11 晚：教師 Fluency 面板改版（最新）
+
+- 已改寫 `gas/seat-planner-api/SeatPlannerFluencyPanel.html`：三步驟列、活動狀態徽章、可收合設定與秒數檢查、全班完成摘要＋篩選、精簡座號卡、三輪對照表含「R1→最新」變化（WPM 不上色）。後端呼叫與資料契約不變；相關 11 項測試通過。
+- 已部署：staging 座位表版本 7；正式 115-1 座位表（指令碼 ID 見 `gas/seat-planner-api/README.md`）版本 7。Celine 已登入確認正式面板可見並可載入單元。
+- 正式座位表版本 6 曾覆蓋掉面板；**以後座位表改版重新部署，必須再用 `mergeTeacherPanel()` 合併面板**。
+- 本次變更**尚未 commit**；應在 Fluency 專用分支的乾淨 checkout 提交，不要在本地混雜的 `main` 提交。
+- Supabase `fluency-challenge-staging` 是免費方案，閒置 7 天會暫停；正式庫也是免費方案，長假前後要注意（升級 Pro 或定時喚醒待 Celine 決定）。
+- 學生端「結果聚焦進步」（每輪顯示與上一輪變化）尚未開始，是下一個候選工作。
 
 ## 目前做到哪
 
