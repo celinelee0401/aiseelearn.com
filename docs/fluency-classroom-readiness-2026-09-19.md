@@ -5,7 +5,7 @@
 - 正式座位表（115-1）已能載入單元設定；唯讀查核正式 Supabase：2 個單元、3 個開放中活動（816 B3U2 09-22、801 B3U2 09-24、801 B3U1 09-24）、84 筆 assignment、3 筆 attempt。801 B3U2 於 09-24 有一位學生完成 R1–R3，`assessment_provider = azure-speech-pronunciation`，WPM／停頓流暢／發音清晰／語調節奏皆有分數。**正式「教師開活動 → 學生登入錄音 → Azure 評分 → 存檔」已實際跑通。**
 - 三個活動自 9 月起仍為開放；是否結束由教師決定。
 - 正式 Supabase 仍為 Free；已在 115-1 座位表加入每日唯讀喚醒（版本 8），需擁有者在 Apps Script 編輯器執行一次 `installFluencyKeepAliveTrigger` 完成授權與排程。
-- 學生端「結果聚焦進步」已完成本機開發與 90 項測試，尚未部署（staging 部署需擁有者核准）。
+- 學生端「結果聚焦進步」經 staging DEMO 實測後，2026-10-11 由擁有者部署至正式站（deploy `6acb6a0851b21ba739a0b815`；回退基準 `6ab09745b7561c1e1af6c156`）。後端 10 個 Functions 由 Fluency 分支打包，相較 9/21 版只多了 9/22 修改的學生身分轉接程式。冒煙檢查：首頁／程式 200、未登入 401、錯誤 PIN 正確拒絕、DEMO 測試圖片 404。
 
 ## 2026-09-21 正式站更新
 
