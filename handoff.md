@@ -63,4 +63,4 @@
 - 正式端對端（03:45Z，假帳號 9999/FIC-AUDIO 座號 60、假活動 B3U3 S1、35 秒合成英文 WAV）：登入 200 → 任務 200 → 送出 202 → 重送 202 → 約 23 秒後輪詢 200，Azure `sdk-continuous-v1` 回 WPM 114.9、停頓流暢 94.5、發音清晰 92.8、語調節奏 89.3 → 任務顯示 completedRounds [1]、資料庫只存 1 筆 round 1 → 登出 200；日誌無 warn/error。
 - 94 項 Fluency 相關測試通過。
 - 尚未驗證：真實 iPad 麥克風錄音、多人同時評分、第 2/3 輪；401 與 403 在日誌中仍同屬 `PROVIDER_AUTH_FAILED`。
-- 測試資料清除：Claude 的 Supabase 連接器是唯讀，需由 Celine 在 Supabase SQL Editor 執行清除 SQL（只刪 9999/FIC-AUDIO 假帳號、其 session、auth_attempts 與假活動）；清除後再唯讀確認 `school_year='9999'` 為 0 筆。
+- 測試資料已清除（04:2xZ，經 Celine 確認筆數後執行）：刪除 9999/FIC-AUDIO 假學生 1、註冊 1、session 5、auth_attempts 5、假活動 1、分派 1、作答 1；複查 `school_year='9999'` 註冊與活動皆 0，真實資料（註冊 123、活動 5、分派 141、作答 3）不變。`/tmp` 內存假帳號 PIN 與 cookie 的暫存檔已刪。Supabase 工具已排程在下次關閉 Claude App 時恢復 `read_only=true`。
