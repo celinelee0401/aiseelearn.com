@@ -1,6 +1,6 @@
 # Fluency Challenge 收工交接
 
-最後更新：2026-10-11 19:00（Asia/Taipei）；最後更新者：Claude Code
+最後更新：2026-10-22 12:35（Asia/Taipei）；最後更新者：Claude Code（接手 Codex）
 
 ## 2026-10-11 傍晚：資料庫喚醒、正式鏈路查核、學生端進步比較（最新）
 
@@ -55,6 +55,11 @@
 - 測試只使用 9999/FIC-O22 獨立帳號；驗證後已刪除該測試帳號、session 與其 auth_attempts，未更動真實學生 PIN、活動、成績。
 
 ## 2026-10-22 背景評分與 Azure 金鑰恢復（Claude 接手 Codex）
+
+**下次開工先做（最新）：**
+1. 課堂上實測第 2、3 輪與多人同時送出（Celine 已在正式站實測第 1 輪）。有問題記下時間與學生看到的訊息，查 Netlify `fluency-assess-background` 日誌的錯誤代碼。
+2. Fluency 分支有 2 筆本機 commit（`7db8203`、`97bd993`）尚未 push；Codex 的背景評分程式尚未做正式 code review。
+3. 本 checkout 的 `node_modules` 是指向 npx 快取的符號連結，只供測試用，不可加入 Git。
 
 - 評分改為 Netlify Background Function：`/api/fluency/assess` 收件後回 202，`fluency-assess-background` 評分，結果放 Blobs `fluency-assessment-jobs`，頁面以 attemptId 輪詢；暫存錄音在工作結束後刪除，同一 attemptId 重送只跑一次。
 - Speech SDK 1.51 在 Node 22+ 會選到瀏覽器 WebSocket 而連不上（1006）；`loadNodeSpeechSdk()` 設 `WebsocketMessageAdapter.forceNpmWebSocket=true`。
