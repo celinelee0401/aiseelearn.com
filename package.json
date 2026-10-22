@@ -13,6 +13,7 @@
     "typecheck:netlify": "tsc --noEmit -p tsconfig.netlify.json"
   },
   "dependencies": {
+    "@netlify/blobs": "10.7.13",
     "microsoft-cognitiveservices-speech-sdk": "1.51.0"
   },
   "devDependencies": {

@@ -60,6 +60,7 @@ export async function handleInternalStudentIdentity(request: Request): Promise<R
     return json({ status: 'ok', requestId: result.requestId, identity: result.identity, error: null });
   } catch (error) {
     if (error instanceof IdentityGatewayError) {
+      console.warn('fluency identity rejected', { code: error.code, status: error.status });
       return json({ status: 'error', requestId: error.requestId, identity: null, error: { code: error.code, message: error.message } }, error.status);
     }
     // Do not log the database response body, credentials, or student identifiers.

@@ -43,3 +43,24 @@
 3. 另行決定 Fluency 分支是否要併回 `main`、如何處理原本兩筆教材 commit 與混雜的本地工作樹；任何合併、提交、推送或部署均須再確認。
 
 詳細流程與踩坑見本專案 `踩坑紀錄.md`，以及 Obsidian `AI Agent 工作流程/Fluency Challenge｜實作流程與踩坑紀錄.md`。
+
+
+## 2026-10-22 正式登入修復
+
+- 修復 checkout：/Users/celinelee/Projects/fluency-challenge-login-fix-20261022，基於 codex/fluency-challenge-20260927，尚未 commit/push。
+- 兩個阻擋點：內部身分服務缺 resolveStudentIdentity；public gateway 與 internal receiver 使用不同名稱的 HMAC 設定，正式連線拒絕簽章。
+- 已補上簽章後限定查詢 active、已啟用且已有 PIN 的身分解析；登入、任務、評分三個 gateway 優先使用 receiver 的 IDENTITY_GATEWAY_HMAC_SECRET_CURRENT，保留舊設定為 fallback。
+- 正式 current/ready：6ad970d519c4a7919995cefa，網址不變。
+- 87 項測試、型別檢查通過。隔離假帳號先重現自主訂正 200/Fluency 401，修復後正式 Fluency 原 PIN 登入 200、session 200、任務服務通過驗證回預期 404（未替假班開活動）、錯誤 PIN 401、原 PIN 再登入 200、登出 200。
+- 測試只使用 9999/FIC-O22 獨立帳號；驗證後已刪除該測試帳號、session 與其 auth_attempts，未更動真實學生 PIN、活動、成績。
+
+## 2026-10-22 背景評分與 Azure 金鑰恢復（Claude 接手 Codex）
+
+- 評分改為 Netlify Background Function：`/api/fluency/assess` 收件後回 202，`fluency-assess-background` 評分，結果放 Blobs `fluency-assessment-jobs`，頁面以 attemptId 輪詢；暫存錄音在工作結束後刪除，同一 attemptId 重送只跑一次。
+- Speech SDK 1.51 在 Node 22+ 會選到瀏覽器 WebSocket 而連不上（1006）；`loadNodeSpeechSdk()` 設 `WebsocketMessageAdapter.forceNpmWebSocket=true`。
+- 修好傳輸後正式日誌改報 `PROVIDER_AUTH_FAILED`：本機假金鑰／錯區域都會 401，確認是 Azure 端金鑰失效（9/24 同一金鑰曾成功）。Celine 已在 Azure 取得現行金鑰並自行更新 Netlify `AZURE_SPEECH_KEY`（Production，03:40Z），區域仍為 East Asia。
+- 正式 current/ready：`6ad98622a73baa107824425f`（同一份 checkout 重新部署，只為載入新金鑰）。
+- 正式端對端（03:45Z，假帳號 9999/FIC-AUDIO 座號 60、假活動 B3U3 S1、35 秒合成英文 WAV）：登入 200 → 任務 200 → 送出 202 → 重送 202 → 約 23 秒後輪詢 200，Azure `sdk-continuous-v1` 回 WPM 114.9、停頓流暢 94.5、發音清晰 92.8、語調節奏 89.3 → 任務顯示 completedRounds [1]、資料庫只存 1 筆 round 1 → 登出 200；日誌無 warn/error。
+- 94 項 Fluency 相關測試通過。
+- 尚未驗證：真實 iPad 麥克風錄音、多人同時評分、第 2/3 輪；401 與 403 在日誌中仍同屬 `PROVIDER_AUTH_FAILED`。
+- 測試資料清除：Claude 的 Supabase 連接器是唯讀，需由 Celine 在 Supabase SQL Editor 執行清除 SQL（只刪 9999/FIC-AUDIO 假帳號、其 session、auth_attempts 與假活動）；清除後再唯讀確認 `school_year='9999'` 為 0 筆。

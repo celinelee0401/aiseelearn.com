@@ -202,6 +202,7 @@ export function createFluencyAssessmentAdapter(options = {}) {
       }));
       return jsonResponse_(503, {
         code: "speech_provider_unavailable",
+        providerCode,
         error: "語音評測暫時無法使用，請稍後再試。"
       });
     }

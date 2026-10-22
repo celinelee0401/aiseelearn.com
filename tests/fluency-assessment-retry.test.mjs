@@ -48,3 +48,27 @@ test("the student UI keeps a recording only for an explicit same-page retry", as
   assert.match(app, /function cleanupAudio_\(\)[\s\S]*?clearPendingRecording_\(\)/);
   assert.match(app, /錄音仍保留在此頁，請勿重新整理/);
 });
+
+test('background evaluation polls through slow and interrupted responses without uploading audio again', async () => {
+  const {waitForAssessment} = await import('../apps/fluency-challenge/lib/assessment-retry.mjs');
+  let calls = 0;
+  const result = await waitForAssessment(new Response(null,{status:202}), {
+    attemptId:'fixture-attempt', wait:async()=>{},
+    fetchImpl:async(url,options)=>{
+      assert.match(url,/attemptId=fixture-attempt/); assert.equal(options.body,undefined);
+      calls++;
+      if(calls===1)throw Error('offline moment');
+      if(calls===2)return new Response(null,{status:504});
+      if(calls<20)return new Response(null,{status:202});
+      return Response.json({assessment:{transcript:'Hello class'}});
+    }
+  });
+  assert.equal(result.status,200);assert.equal(calls,20);
+});
+test('background polling preserves final errors and stops after a bounded wait',async()=>{
+  const {waitForAssessment}=await import('../apps/fluency-challenge/lib/assessment-retry.mjs');
+  const options={attemptId:'fixture',wait:async()=>{}};
+  const failed=await waitForAssessment(new Response(null,{status:202}),{...options,fetchImpl:async()=>Response.json({error:'bad audio'},{status:422})});
+  assert.equal(failed.status,422);
+  assert.equal(await waitForAssessment(new Response(null,{status:202}),{...options,maxPolls:2,fetchImpl:async()=>new Response(null,{status:202})}),null);
+});

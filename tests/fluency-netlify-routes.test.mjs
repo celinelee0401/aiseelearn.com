@@ -7,6 +7,7 @@ const expectedRoutes = new Map([
   ['fluency-auth-logout.ts', '/api/fluency/auth/logout'],
   ['fluency-session.ts', '/api/fluency/session'],
   ['fluency-task.ts', '/api/fluency/task'],
+  ['fluency-assess-background.ts', '/api/internal/fluency-assess-job'],
   ['fluency-assess.ts', '/api/fluency/assess'],
   ['fluency-internal-student-identity.ts', '/api/internal/student-identity'],
   ['fluency-internal-task.ts', '/api/internal/fluency-task'],

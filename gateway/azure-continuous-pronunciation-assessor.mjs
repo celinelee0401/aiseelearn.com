@@ -7,8 +7,8 @@ export function createAzureContinuousPronunciationAssessor(options = {}) {
   const {
     key,
     region,
-    timeoutMs = DEFAULT_TIMEOUT_MS,
-    loadSdk = () => import("microsoft-cognitiveservices-speech-sdk")
+    timeoutMs,
+    loadSdk = loadNodeSpeechSdk
   } = options;
   if (typeof key !== "string" || key.length < 16 || !/^[a-z0-9-]+$/i.test(String(region || ""))) {
     throw new TypeError("Azure Speech configuration is invalid");
@@ -52,7 +52,7 @@ export function createAzureContinuousPronunciationAssessor(options = {}) {
       throw new AssessmentProviderError("PROVIDER_CONFIGURATION_FAILED", "Assessment service unavailable.");
     }
 
-    const segments = await collectSegments_(sdk, recognizer, timeoutMs).finally(() => {
+    const segments = await collectSegments_(sdk, recognizer, timeoutMs ?? Math.max(DEFAULT_TIMEOUT_MS, input.durationMs + 20_000)).finally(() => {
       closeQuietly_(recognizer, audioConfig, pronunciationConfig);
     });
     return aggregateSegments_(segments, input.durationMs);
@@ -95,14 +95,16 @@ function collectSegments_(sdk, recognizer, timeoutMs) {
     };
     recognizer.canceled = (_sender, event) => {
       if (event?.reason === sdk.CancellationReason.Error) {
-        finish(new AssessmentProviderError("PROVIDER_UNAVAILABLE", "Assessment service unavailable."));
+        const auth = event.errorCode === sdk.CancellationErrorCode?.AuthenticationFailure || event.errorCode === sdk.CancellationErrorCode?.Forbidden;
+        const limited = event.errorCode === sdk.CancellationErrorCode?.TooManyRequests;
+        finish(transportError(event.errorDetails, auth ? "PROVIDER_AUTH_FAILED" : limited ? "PROVIDER_RATE_LIMITED" : "PROVIDER_CONNECTION_FAILED"));
       }
     };
     recognizer.sessionStopped = () => finish();
     try {
       recognizer.startContinuousRecognitionAsync(
         () => {},
-        () => finish(new AssessmentProviderError("PROVIDER_UNAVAILABLE", "Assessment service unavailable."))
+        (error) => finish(transportError(error, "PROVIDER_START_FAILED"))
       );
     } catch {
       finish(new AssessmentProviderError("PROVIDER_UNAVAILABLE", "Assessment service unavailable."));
@@ -182,4 +184,29 @@ function closeQuietly_(...resources) {
   for (const resource of resources) {
     try { resource?.close?.(); } catch { /* no sensitive SDK details in logs */ }
   }
+}
+
+
+// Node 22+ exposes a browser-style global WebSocket. Speech SDK 1.51 otherwise
+// selects that transport and loses the authentication headers it needs.
+// Pin the SDK's supported Node transport instead of changing globalThis.
+export async function loadNodeSpeechSdk() {
+  const [sdk, { WebsocketMessageAdapter }] = await Promise.all([
+    import("microsoft-cognitiveservices-speech-sdk"),
+    import("microsoft-cognitiveservices-speech-sdk/distrib/lib/src/common.browser/WebsocketMessageAdapter.js")
+  ]);
+  WebsocketMessageAdapter.forceNpmWebSocket = true;
+  return sdk;
+}
+
+
+function transportError(details, fallback) {
+  const text = typeof details === "string" ? details : String(details?.message || "");
+  const code = /\b401\b|\b403\b/.test(text) ? "PROVIDER_AUTH_FAILED"
+    : /\b429\b/.test(text) ? "PROVIDER_RATE_LIMITED"
+    : /Dynamic require|require is not defined|not supported/.test(text) ? "PROVIDER_RUNTIME_INCOMPATIBLE"
+    : /ENOTFOUND|EAI_AGAIN/.test(text) ? "PROVIDER_DNS_FAILED"
+    : /ETIMEDOUT|timed out/i.test(text) ? "PROVIDER_NETWORK_TIMEOUT"
+    : /certificate|CERT_|TLS|SSL/.test(text) ? "PROVIDER_TLS_FAILED" : fallback;
+  return new AssessmentProviderError(code, "Assessment service unavailable.");
 }

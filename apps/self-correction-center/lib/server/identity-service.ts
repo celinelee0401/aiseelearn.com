@@ -2,13 +2,14 @@ import {
   activateStudentCredentials,
   AuthError,
   type EnrollmentRow,
+  resolveStudentIdentity,
   validateStudentSessionCredential,
   verifyStudentCredentials,
 } from './auth';
 import type { IdentityServiceConfig } from './config';
 import { SignedServiceError, verifySignedServiceRequest } from './signed-service';
 
-type IdentityAction = 'verifyStudentCredentials' | 'activateStudentIdentity' | 'validateStudentSession';
+type IdentityAction = 'resolveStudentIdentity' | 'verifyStudentCredentials' | 'activateStudentIdentity' | 'validateStudentSession';
 
 type IdentityCredentials = {
   schoolYear: string;
@@ -66,7 +67,9 @@ function identityCredentials(value: unknown, action: IdentityAction): IdentityCr
   const sharedInvalid = typeof credentials.schoolYear !== 'string'
     || typeof credentials.classCode !== 'string'
     || !Number.isInteger(Number(credentials.seatNumber));
-  const actionValid = action === 'validateStudentSession'
+  const actionValid = action === 'resolveStudentIdentity'
+    ? true
+    : action === 'validateStudentSession'
     ? typeof credentials.enrollmentId === 'string' && typeof credentials.credentialVersion === 'string'
     : typeof credentials.pin === 'string'
       && (action !== 'activateStudentIdentity' || typeof credentials.activationCode === 'string');
@@ -83,7 +86,7 @@ export async function handleIdentityGatewayRequest(config: IdentityServiceConfig
       ...config,
       currentSecret: config.identityGatewayHmacSecretCurrent,
       previousSecret: config.identityGatewayHmacSecretPrevious,
-    }, value, ['verifyStudentCredentials', 'activateStudentIdentity', 'validateStudentSession'], now);
+    }, value, ['resolveStudentIdentity', 'verifyStudentCredentials', 'activateStudentIdentity', 'validateStudentSession'], now);
   } catch (error) {
     if (error instanceof SignedServiceError) {
       throw new IdentityGatewayError(error.code, error.message, error.status, error.requestId);
@@ -94,7 +97,9 @@ export async function handleIdentityGatewayRequest(config: IdentityServiceConfig
   const credentials = identityCredentials(request.credentials, action);
 
   try {
-    const enrollment = action === 'validateStudentSession'
+    const enrollment = action === 'resolveStudentIdentity'
+      ? await resolveStudentIdentity(config, credentials)
+      : action === 'validateStudentSession'
       ? await validateStudentSessionCredential(config, {
           ...credentials,
           enrollmentId: credentials.enrollmentId ?? '',

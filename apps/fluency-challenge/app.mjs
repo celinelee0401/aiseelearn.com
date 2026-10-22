@@ -9,7 +9,7 @@ import {
   normalizeCompletedRounds
 } from "./lib/round-progress.mjs";
 import { urlWithUnit } from "./lib/unit-url.mjs";
-import { canRetryAssessment, createAssessmentForm } from "./lib/assessment-retry.mjs";
+import { canRetryAssessment, createAssessmentForm, waitForAssessment } from "./lib/assessment-retry.mjs";
 import {
   biggestGain,
   compareRounds,
@@ -243,7 +243,17 @@ async function submitPendingAssessment_() {
     round: currentRound_().round,
     audio: recording.blob
   });
-  const response = await safeFetch_(api.assess, { method: "POST", body: form });
+  const submitted = await safeFetch_(api.assess, { method: "POST", body: form });
+  const response = await waitForAssessment(submitted, {
+    attemptId: state.pendingAttemptId,
+    fetchImpl: fetch,
+    onProgress: (seconds) => {
+      elements.recordButtonText.textContent = "評測進行中…";
+      elements.recordMessage.textContent = seconds < 30
+        ? "錄音已收到，正在評測。請保留此頁，完成後會自動顯示結果。"
+        : "語音評測仍在進行，系統會自動取得結果，不需要重新送出。";
+    }
+  });
   const body = await jsonOrNull_(response);
   state.stopping = false;
   if (response?.status === 409) {

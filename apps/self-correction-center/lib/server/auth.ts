@@ -82,6 +82,17 @@ async function findEnrollment(config: AppConfig, identity: IdentityInput): Promi
   return rows[0] ?? null;
 }
 
+/** Only called after the identity gateway verifies a trusted server signature.
+ * The calling gateway has already authenticated the PIN with its authority.
+ */
+export async function resolveStudentIdentity(config: AppConfig, input: IdentityInput): Promise<EnrollmentRow> {
+  const enrollment = await findEnrollment(config, normalizeIdentity(input));
+  if (!enrollment?.activated_at || !enrollment.pin_hash) {
+    throw new AuthError('Authentication failed.', 401);
+  }
+  return enrollment;
+}
+
 async function recordAttempt(config: AppConfig, identityHash: string, enrollmentId: string | null, success: boolean, reason: string): Promise<void> {
   await supabaseRequest(config, 'auth_attempts', {
     method: 'POST',

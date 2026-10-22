@@ -12,7 +12,7 @@ const handler = createStudentIdentityNetlifyAdapter({
     SELF_CORRECTION_LOGIN_URL: Netlify.env.get(
       "SELF_CORRECTION_LOGIN_URL"
     ),
-    STUDENT_IDENTITY_HMAC_SECRET_CURRENT: Netlify.env.get(
+    STUDENT_IDENTITY_HMAC_SECRET_CURRENT: Netlify.env.get("IDENTITY_GATEWAY_HMAC_SECRET_CURRENT") || Netlify.env.get(
       "STUDENT_IDENTITY_HMAC_SECRET_CURRENT"
     ),
     FLUENCY_SESSION_SECRET: Netlify.env.get("FLUENCY_SESSION_SECRET")
